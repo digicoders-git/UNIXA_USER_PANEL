@@ -166,18 +166,33 @@ const AMCPlans = () => {
                          </div>
                          <p className="text-sm font-bold text-slate-700">{plan.partsIncluded ? 'Full Spares Covered' : 'Spares Chargeable'}</p>
                       </div>
-                      <div className="flex items-center gap-3">
-                         <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                            <Check size={16} strokeWidth={3} />
-                         </div>
-                         <p className="text-sm font-bold text-slate-700">Unlimited Repair Calls</p>
-                      </div>
-                      <div className="flex items-center gap-3">
-                         <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                            <Check size={16} strokeWidth={3} />
-                         </div>
-                         <p className="text-sm font-bold text-slate-700">24h Response Time</p>
-                      </div>
+                      
+                      {/* Dynamic Features Coverage */}
+                      {plan.features?.map((f, fi) => (
+                        <div key={fi} className="flex items-center gap-3">
+                           <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                              <Check size={16} strokeWidth={3} />
+                           </div>
+                           <p className="text-sm font-bold text-slate-700">{f}</p>
+                        </div>
+                      ))}
+
+                      {(!plan.features || plan.features.length === 0) && (
+                        <>
+                          <div className="flex items-center gap-3">
+                             <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                                <Check size={16} strokeWidth={3} />
+                             </div>
+                             <p className="text-sm font-bold text-slate-700">Unlimited Repair Calls</p>
+                          </div>
+                          <div className="flex items-center gap-3">
+                             <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                                <Check size={16} strokeWidth={3} />
+                             </div>
+                             <p className="text-sm font-bold text-slate-700">24h Response Time</p>
+                          </div>
+                        </>
+                      )}
                    </div>
 
                    <button 

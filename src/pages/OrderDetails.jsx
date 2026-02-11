@@ -11,7 +11,8 @@ import {
   ArrowLeft,
   MapPin,
   CreditCard,
-  Receipt
+  Receipt,
+  X
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -123,18 +124,102 @@ const OrderDetails = () => {
             </div>
           </div>
 
-          {/* Timeline / Tracking (Simple Placeholder for now) */}
-          <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
-            <h3 className="font-bold text-slate-900 mb-6 flex items-center gap-2">
-              <Truck size={18} className="text-slate-400" /> Order Timeline
+          {/* Dynamic Order Timeline */}
+          <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 lg:p-8">
+            <h3 className="font-bold text-slate-900 mb-8 flex items-center gap-2">
+              <Truck size={18} className="text-slate-400" /> Order Tracking
             </h3>
-            <div className="relative pl-4 border-l-2 border-slate-100 space-y-8">
-              <div className="relative">
-                <div className="absolute -left-[21px] top-1 w-4 h-4 rounded-full bg-indigo-600 border-4 border-white shadow-sm"></div>
-                <p className="text-sm font-bold text-slate-900">Order Placed</p>
-                <p className="text-xs text-slate-500 mt-1">{format(new Date(order.createdAt), "MMM dd, yyyy 'at' hh:mm a")}</p>
+            
+            <div className="relative">
+              {/* Vertical Line */}
+              <div className="absolute left-[11px] top-2 bottom-2 w-0.5 bg-slate-100"></div>
+
+              <div className="space-y-10 relative">
+                {/* Placed */}
+                <div className="flex gap-6 relative">
+                  <div className="z-10 w-6 h-6 rounded-full bg-indigo-600 border-4 border-white shadow-md flex items-center justify-center">
+                    <div className="w-1.5 h-1.5 rounded-full bg-white"></div>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight">Order Placed</h4>
+                    <p className="text-xs text-slate-400 font-medium mt-1">
+                      {format(new Date(order.createdAt), "MMM dd, yyyy 'at' hh:mm a")}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Confirmed */}
+                {(order.confirmedAt || ['confirmed', 'shipped', 'delivered'].includes(order.status?.toLowerCase())) && (
+                  <div className="flex gap-6 relative animate-in slide-in-from-left-2">
+                    <div className="z-10 w-6 h-6 rounded-full bg-indigo-600 border-4 border-white shadow-md flex items-center justify-center">
+                      <div className="w-1.5 h-1.5 rounded-full bg-white"></div>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight">Order Confirmed</h4>
+                      <p className="text-xs text-slate-400 font-medium mt-1">
+                        {order.confirmedAt 
+                          ? format(new Date(order.confirmedAt), "MMM dd, yyyy 'at' hh:mm a")
+                          : "Your order has been confirmed and is being processed."
+                        }
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Shipped */}
+                {(order.shippedAt || ['shipped', 'delivered'].includes(order.status?.toLowerCase())) && (
+                  <div className="flex gap-6 relative animate-in slide-in-from-left-2">
+                    <div className="z-10 w-6 h-6 rounded-full bg-indigo-600 border-4 border-white shadow-md flex items-center justify-center">
+                       <div className="w-1.5 h-1.5 rounded-full bg-white"></div>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight">Shipped</h4>
+                      <p className="text-xs text-slate-400 font-medium mt-1">
+                        {order.shippedAt 
+                          ? format(new Date(order.shippedAt), "MMM dd, yyyy 'at' hh:mm a")
+                          : "Your package is on its way."
+                        }
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Delivered */}
+                {(order.deliveredAt || order.status?.toLowerCase() === 'delivered') && (
+                  <div className="flex gap-6 relative animate-in slide-in-from-left-2">
+                    <div className="z-10 w-6 h-6 rounded-full bg-emerald-500 border-4 border-white shadow-md flex items-center justify-center">
+                       <CheckCircle size={10} className="text-white" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-black text-emerald-600 uppercase tracking-tight">Delivered</h4>
+                      <p className="text-xs text-slate-400 font-medium mt-1">
+                        {order.deliveredAt 
+                          ? format(new Date(order.deliveredAt), "MMM dd, yyyy 'at' hh:mm a")
+                          : "Successfully delivered to your address."
+                        }
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Cancelled */}
+                {(order.cancelledAt || order.status?.toLowerCase() === 'cancelled') && (
+                  <div className="flex gap-6 relative animate-in slide-in-from-left-2">
+                    <div className="z-10 w-6 h-6 rounded-full bg-red-500 border-4 border-white shadow-md flex items-center justify-center">
+                       <X size={10} className="text-white" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-black text-red-600 uppercase tracking-tight">Cancelled</h4>
+                      <p className="text-xs text-slate-400 font-medium mt-1">
+                        {order.cancelledAt 
+                          ? format(new Date(order.cancelledAt), "MMM dd, yyyy 'at' hh:mm a")
+                          : "This order was cancelled."
+                        }
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
-              {/* You can map more statuses here dynamically based on backend data if available */}
             </div>
           </div>
 

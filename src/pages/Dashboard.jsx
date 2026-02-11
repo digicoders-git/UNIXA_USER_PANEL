@@ -9,13 +9,14 @@ import {
   TrendingUp,
   Package
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
 import api from "../services/api";
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -63,7 +64,7 @@ const Dashboard = () => {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Active AMC */}
-        <div className="bg-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100/80 hover:border-blue-200 transition-all group">
+        <Link to="/my-amcs" className="bg-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100/80 hover:border-blue-200 transition-all group block">
            <div className="flex justify-between items-start mb-6">
               <div className={`p-3 rounded-2xl ${amc?.active ? 'bg-green-50 text-green-600' : 'bg-slate-50 text-slate-400'}`}>
                  <ShieldCheck size={24} strokeWidth={2.5} />
@@ -83,10 +84,10 @@ const Dashboard = () => {
                  </p>
               )}
            </div>
-        </div>
+        </Link>
 
         {/* Rental Status */}
-        <div className="bg-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100/80 hover:border-blue-200 transition-all group">
+        <Link to="/rented-ro" className="bg-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100/80 hover:border-blue-200 transition-all group block">
            <div className="flex justify-between items-start mb-6">
               <div className={`p-3 rounded-2xl ${rental?.active ? 'bg-blue-50 text-blue-600' : 'bg-slate-50 text-slate-400'}`}>
                  <RefreshCw size={24} strokeWidth={2.5} />
@@ -106,7 +107,7 @@ const Dashboard = () => {
                  </p>
               )}
            </div>
-        </div>
+        </Link>
 
         {/* Active Orders */}
         <div className="bg-white p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100/80 hover:border-blue-200 transition-all group">
@@ -161,7 +162,14 @@ const Dashboard = () => {
              <div className="space-y-4">
                 {recentActivity?.length > 0 ? (
                   recentActivity.map((item, i) => (
-                    <div key={i} className="flex items-center gap-5 p-5 rounded-3xl bg-white border border-slate-100 hover:border-blue-100 hover:shadow-[0_4px_20px_rgb(0,0,0,0.03)] transition-all group">
+                    <div 
+                      key={i} 
+                      onClick={() => {
+                        if (item.type === 'order' && item.refId) navigate(`/orders/${item.refId}`);
+                        else if (item.type === 'service') navigate('/service-support');
+                      }}
+                      className="flex items-center gap-5 p-5 rounded-3xl bg-white border border-slate-100 hover:border-blue-100 hover:shadow-[0_4px_20px_rgb(0,0,0,0.03)] transition-all group cursor-pointer"
+                    >
                        <div className={`p-3 rounded-2xl shrink-0 ${item.type === 'order' ? 'bg-blue-50 text-blue-600' : 'bg-orange-50 text-orange-600'}`}>
                           {item.type === 'order' ? <Package size={20} strokeWidth={2.5} /> : <Clock size={20} strokeWidth={2.5} />}
                        </div>

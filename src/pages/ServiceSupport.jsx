@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import api from "../services/api";
 import Swal from "sweetalert2";
 import { Wrench, Phone, MessageSquare, History, Clock, CheckCircle, Calendar, MapPin, XCircle, AlertTriangle } from "lucide-react";
+import { FaUserTie } from "react-icons/fa";
 import { format } from "date-fns";
 import { useAuth } from "../context/AuthContext";
 
@@ -254,10 +255,29 @@ Phone: ${formData.phone}
                             <div className="pl-0 md:pl-16 space-y-4">
                                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
                                   <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-wrap">{req.description}</p>
+                                  
+                                  {req.assignedTechnician && (
+                                     <div className="mt-4 pt-4 border-t border-slate-200 flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                           <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                                              <FaUserTie size={14} />
+                                           </div>
+                                           <div>
+                                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Technician Assigned</p>
+                                              <p className="text-sm font-bold text-slate-900">{req.assignedTechnician}</p>
+                                           </div>
+                                        </div>
+                                        <div className="hidden md:flex items-center gap-2 text-indigo-500">
+                                           <CheckCircle size={14} />
+                                           <span className="text-[10px] font-black uppercase tracking-widest">En Route</span>
+                                        </div>
+                                     </div>
+                                  )}
+
                                   {req.resolutionNotes && (
-                                     <div className="mt-4 pt-4 border-t border-slate-200">
-                                        <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-1">Technician Note</p>
-                                        <p className="text-slate-700 text-sm">{req.resolutionNotes}</p>
+                                     <div className={`mt-4 pt-4 border-t border-slate-200 ${!req.assignedTechnician ? '' : 'mt-2 border-t-0 pt-2'}`}>
+                                        <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1">Update / Resolution Notes</p>
+                                        <p className="text-slate-700 text-sm italic">"{req.resolutionNotes}"</p>
                                      </div>
                                   )}
                                </div>

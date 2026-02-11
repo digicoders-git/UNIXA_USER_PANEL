@@ -8,8 +8,10 @@ import MyOrders from "./pages/MyOrders";
 import OrderDetails from "./pages/OrderDetails";
 import RentedRO from "./pages/RentedRO";
 import AMCPlans from "./pages/AMCPlans";
+import MyAMCs from "./pages/MyAMCs";
 import ServiceSupport from "./pages/ServiceSupport";
 import Profile from "./pages/Profile";
+import Notifications from "./pages/Notifications";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -35,7 +37,9 @@ const App = () => {
             <Route path="orders/:orderId" element={<OrderDetails />} />
             <Route path="rented-ro" element={<RentedRO />} />
             <Route path="amc-plans" element={<AMCPlans />} />
+            <Route path="my-amcs" element={<MyAMCs />} />
             <Route path="service-support" element={<ServiceSupport />} />
+            <Route path="notifications" element={<Notifications />} />
             <Route path="profile" element={<Profile />} />
           </Route>
 

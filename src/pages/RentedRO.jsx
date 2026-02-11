@@ -6,6 +6,7 @@ import { format, differenceInDays } from "date-fns";
 
 const RentedRO = () => {
   const [rental, setRental] = useState(null);
+  const [amc, setAmc] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -16,6 +17,7 @@ const RentedRO = () => {
     try {
       const { data } = await api.get("/user-rentals");
       setRental(data?.rental || null);
+      setAmc(data?.amc || null);
     } catch (error) {
       console.error("Failed to fetch rental details", error);
     } finally {
@@ -50,7 +52,7 @@ const RentedRO = () => {
               Get an advanced RO purifier with zero initial cost and free lifetime maintenance. Plans start at just <span className="font-bold text-slate-900">₹399/mo</span>.
            </p>
            {/* Placeholder button - to be linked to rental plans page later */}
-           <button className="mt-8 px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/20 hover:bg-indigo-700 hover:-translate-y-1 transition-all text-sm flex items-center gap-2 mx-auto">
+           <button className="mt-8 px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-200 hover:bg-indigo-700 hover:-translate-y-1 transition-all text-sm flex items-center gap-2 mx-auto">
               Explore Rental Plans
            </button>
         </div>
@@ -66,7 +68,7 @@ const RentedRO = () => {
                     ) : (
                        <div className="flex flex-col items-center justify-center text-slate-300 font-bold">
                           <ShieldCheck size={48} />
-                          <span className="mt-2">No Image</span>
+                          <span className="mt-2 text-xs uppercase tracking-widest">No Image</span>
                        </div>
                     )}
                  </div>
@@ -82,12 +84,16 @@ const RentedRO = () => {
                           <IndianRupee size={16} /> {rental.amount}/month
                        </p>
                     </div>
-                    <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-2 ${
-                      rental.status === 'Active' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
-                    }`}>
-                       {rental.status === 'Active' ? <CheckCircle size={14} /> : <AlertCircle size={14} />} 
-                       {rental.status}
-                    </span>
+                     <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-2 ${
+                       rental.status === 'Active' ? 'bg-emerald-100 text-emerald-700' : 
+                       rental.status === 'Pending' ? 'bg-amber-100 text-amber-700' :
+                       'bg-red-100 text-red-700'
+                     }`}>
+                        {rental.status === 'Active' ? <CheckCircle size={14} /> : 
+                         rental.status === 'Pending' ? <Clock size={14} /> : 
+                         <AlertCircle size={14} />} 
+                        {rental.status}
+                     </span>
                  </div>
 
                  {/* Stats Grid */}
@@ -116,6 +122,34 @@ const RentedRO = () => {
                        <p className="text-[10px] text-blue-500 font-bold mt-1">Free Service Included</p>
                     </div>
                  </div>
+
+                 {/* AMC Details if active */}
+                 {amc && amc.status === 'Active' && (
+                    <div className="p-6 bg-indigo-50/50 rounded-3xl border border-indigo-100/50 space-y-4 transition-all hover:bg-indigo-50">
+                       <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-2">
+                             <ShieldCheck className="text-indigo-600" size={20} />
+                             <h3 className="font-black text-slate-800 uppercase tracking-tight text-sm">Active AMC Plan</h3>
+                          </div>
+                          <span className="bg-indigo-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">{amc.planName}</span>
+                       </div>
+                       
+                       <div className="grid grid-cols-3 gap-4">
+                          <div className="text-center">
+                             <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Services</p>
+                             <p className="font-black text-slate-800">{amc.servicesUsed}/{amc.servicesTotal}</p>
+                          </div>
+                          <div className="text-center border-x border-slate-200">
+                             <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Parts</p>
+                             <p className="font-black text-slate-800 text-xs">{amc.partsIncluded ? 'COVERED' : 'NOT COVERED'}</p>
+                          </div>
+                          <div className="text-center">
+                             <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Expiry</p>
+                             <p className="font-black text-slate-800">{amc.endDate ? format(new Date(amc.endDate), "dd/MM/yy") : 'N/A'}</p>
+                          </div>
+                       </div>
+                    </div>
+                 )}
 
                  <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-slate-50">
                     <button className="flex-1 py-3.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 hover:-translate-y-0.5 transition-all shadow-lg shadow-indigo-200 text-sm flex items-center justify-center gap-2">
