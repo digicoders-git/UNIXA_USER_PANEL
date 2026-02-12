@@ -285,6 +285,28 @@ const OrderDetails = () => {
               </div>
            </div>
 
+           {/* Actions */}
+           {order.status === 'pending' && (
+             <button 
+               onClick={async () => {
+                 if (window.confirm("Are you sure you want to cancel this order?")) {
+                   try {
+                     await api.put(`/user-orders/${order._id}/cancel`);
+                     // Refetch or local update
+                     const { data } = await api.get(`/user-orders/${orderId}`);
+                     setOrder(data.order);
+                     alert("Order cancelled successfully");
+                   } catch (error) {
+                     alert(error.response?.data?.message || "Failed to cancel order");
+                   }
+                 }
+               }}
+               className="w-full py-4 bg-red-50 text-red-600 rounded-3xl font-bold text-sm hover:bg-red-100 transition-all border border-red-100 flex items-center justify-center gap-2"
+             >
+               <X size={18} /> Cancel Order
+             </button>
+           )}
+
         </div>
       </div>
     </div>
