@@ -15,10 +15,27 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { user, loginWithToken } = useAuth();
   const navigate = useNavigate();
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Check for token from website
+    const checkWebsiteToken = async () => {
+      const websiteToken = localStorage.getItem('userPanelToken');
+      if (websiteToken && !user) {
+        try {
+          await loginWithToken(websiteToken);
+          localStorage.removeItem('userPanelToken');
+        } catch (error) {
+          console.error('Failed to login with website token:', error);
+        }
+      }
+    };
+    
+    checkWebsiteToken();
+  }, []);
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -32,8 +49,12 @@ const Dashboard = () => {
       }
     };
 
-    fetchDashboard();
-  }, []);
+    if (user) {
+      fetchDashboard();
+    } else {
+      setLoading(false);
+    }
+  }, [user]);
 
   if (loading) {
     return (
