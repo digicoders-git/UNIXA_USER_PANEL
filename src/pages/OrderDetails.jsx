@@ -12,7 +12,8 @@ import {
   MapPin,
   CreditCard,
   Receipt,
-  X
+  X,
+  RefreshCw
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -20,6 +21,11 @@ const OrderDetails = () => {
   const { orderId } = useParams();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showRefundModal, setShowRefundModal] = useState(false);
+  const [refundForm, setRefundForm] = useState({
+    type: "Cancellation",
+    reason: ""
+  });
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
@@ -45,6 +51,27 @@ const OrderDetails = () => {
     if (s === 'confirmed') return { color: "bg-indigo-50 text-indigo-600 border-indigo-100", icon: <Package size={16} />, label: "Confirmed" };
     if (s === 'cancelled') return { color: "bg-red-50 text-red-600 border-red-100", icon: <AlertCircle size={16} />, label: "Cancelled" };
     return { color: "bg-amber-50 text-amber-600 border-amber-100", icon: <Clock size={16} />, label: "Processing" };
+  };
+
+  const handleRefundRequest = async () => {
+    if (!refundForm.reason.trim()) {
+      alert("Please provide a reason for refund");
+      return;
+    }
+    try {
+      await api.post("/refunds", {
+        orderId: order._id,
+        userId: order.userId,
+        type: refundForm.type,
+        reason: refundForm.reason,
+        amount: order.total
+      });
+      alert("Refund request submitted successfully!");
+      setShowRefundModal(false);
+      setRefundForm({ type: "Cancellation", reason: "" });
+    } catch (error) {
+      alert(error.response?.data?.message || "Failed to submit refund request");
+    }
   };
 
   if (loading) {
@@ -292,7 +319,6 @@ const OrderDetails = () => {
                  if (window.confirm("Are you sure you want to cancel this order?")) {
                    try {
                      await api.put(`/user-orders/${order._id}/cancel`);
-                     // Refetch or local update
                      const { data } = await api.get(`/user-orders/${orderId}`);
                      setOrder(data.order);
                      alert("Order cancelled successfully");
@@ -307,8 +333,77 @@ const OrderDetails = () => {
              </button>
            )}
 
+           {/* Refund Request Button */}
+           {['delivered', 'shipped'].includes(order.status?.toLowerCase()) && (
+             <button 
+               onClick={() => setShowRefundModal(true)}
+               className="w-full py-4 bg-purple-50 text-purple-600 rounded-3xl font-bold text-sm hover:bg-purple-100 transition-all border border-purple-100 flex items-center justify-center gap-2"
+             >
+               <RefreshCw size={18} /> Request Refund
+             </button>
+           )}
+
         </div>
       </div>
+
+      {/* Refund Modal */}
+      {showRefundModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-black text-slate-900">Request Refund</h3>
+              <button onClick={() => setShowRefundModal(false)} className="p-2 hover:bg-slate-100 rounded-full">
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-2">Request Type</label>
+                <select 
+                  value={refundForm.type}
+                  onChange={(e) => setRefundForm({...refundForm, type: e.target.value})}
+                  className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none"
+                >
+                  <option value="Cancellation">Cancellation</option>
+                  <option value="Return">Return</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-bold text-slate-700 mb-2">Reason</label>
+                <textarea 
+                  value={refundForm.reason}
+                  onChange={(e) => setRefundForm({...refundForm, reason: e.target.value})}
+                  placeholder="Please explain why you want a refund..."
+                  rows="4"
+                  className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none resize-none"
+                />
+              </div>
+              
+              <div className="bg-purple-50 p-4 rounded-xl border border-purple-100">
+                <p className="text-sm font-bold text-purple-900">Refund Amount</p>
+                <p className="text-2xl font-black text-purple-600">₹{order.total?.toLocaleString()}</p>
+              </div>
+              
+              <div className="flex gap-3">
+                <button 
+                  onClick={() => setShowRefundModal(false)}
+                  className="flex-1 py-3 bg-slate-100 text-slate-700 rounded-xl font-bold hover:bg-slate-200 transition-all"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleRefundRequest}
+                  className="flex-1 py-3 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition-all"
+                >
+                  Submit Request
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
