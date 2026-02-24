@@ -180,7 +180,7 @@ const UserLayout = () => {
                                           <p className="text-xs font-bold text-slate-900 mb-0.5">{n.title}</p>
                                           <p className="text-[11px] text-slate-500 leading-tight line-clamp-2">{n.message}</p>
                                           <p className="text-[9px] text-slate-400 font-bold mt-2 uppercase tracking-tight">
-                                             {format(new Date(n.createdAt), 'p')}
+                                             {new Date(n.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                                           </p>
                                        </div>
                                     ))}

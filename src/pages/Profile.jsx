@@ -40,14 +40,14 @@ const Profile = () => {
      try {
         const [ordersRes, amcRes] = await Promise.all([
            api.get("/user-orders"),
-           api.get("/amc-user/my-subscriptions").catch(() => ({ data: { amc: [] } }))
+           api.get("/my-amcs?status=Active").catch(() => ({ data: { amcs: [] } }))
         ]);
         
         const orders = ordersRes.data.orders || [];
-        // Filter out cancelled/returned for accurate spending
         const validOrders = orders.filter(o => !['cancelled', 'returned', 'failed'].includes(o.status));
         const totalSpent = validOrders.reduce((acc, order) => acc + (order.total || 0), 0);
-        const activePlan = amcRes.data?.amc?.[0]?.planName || "No Active Plan";
+        const activeAmcs = amcRes.data?.amcs || [];
+        const activePlan = activeAmcs.length > 0 ? `${activeAmcs.length} Active` : "No Active Plan";
 
         setStats({
            orders: orders.length,

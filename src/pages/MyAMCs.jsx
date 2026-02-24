@@ -22,7 +22,8 @@ const MyAMCs = () => {
 
   useEffect(() => {
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const interval = setInterval(fetchData, 30000);
+    return () => clearInterval(interval);
   }, [filter]);
 
   const fetchData = async () => {
@@ -33,6 +34,7 @@ const MyAMCs = () => {
         api.get('/my-amcs/summary')
       ]);
       
+      console.log('AMC Data:', amcsRes.data?.amcs);
       setAmcs(amcsRes.data?.amcs || []);
       setSummary(summaryRes.data?.summary || null);
     } catch (error) {
@@ -49,7 +51,7 @@ const MyAMCs = () => {
   };
 
   const handleRequestService = async (amc) => {
-    if (amc.servicesRemaining <= 0) {
+    if (amc.servicesUsed >= amc.servicesTotal) {
       Swal.fire({
         title: "No Services Remaining",
         text: "All service visits have been used. Please renew your AMC.",
@@ -146,20 +148,28 @@ const MyAMCs = () => {
         </div>
 
         {/* Filter Tabs */}
-        <div className="flex gap-2 bg-slate-100 p-1 rounded-2xl">
-          {['Active', 'Expired', 'all'].map((status) => (
-            <button
-              key={status}
-              onClick={() => setFilter(status)}
-              className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
-                filter === status
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-400 hover:text-slate-600'
-              }`}
-            >
-              {status === 'all' ? 'All' : status}
-            </button>
-          ))}
+        <div className="flex gap-2 items-center">
+          <button
+            onClick={fetchData}
+            className="px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-700 transition-all"
+          >
+            Refresh
+          </button>
+          <div className="flex gap-2 bg-slate-100 p-1 rounded-2xl">
+            {['Active', 'Expired', 'all'].map((status) => (
+              <button
+                key={status}
+                onClick={() => setFilter(status)}
+                className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+                  filter === status
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-400 hover:text-slate-600'
+                }`}
+              >
+                {status === 'all' ? 'All' : status}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -306,7 +316,7 @@ const MyAMCs = () => {
                 <div className="flex gap-3">
                   <button
                     onClick={() => handleRequestService(amc)}
-                    disabled={amc.status === 'Expired' || amc.servicesRemaining <= 0}
+                    disabled={amc.status === 'Expired' || amc.servicesUsed >= amc.servicesTotal}
                     className="flex-1 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest bg-blue-600 text-white hover:bg-blue-700 disabled:bg-slate-100 disabled:text-slate-400 transition-all active:scale-95 flex items-center justify-center gap-2"
                   >
                     <Wrench size={14} />

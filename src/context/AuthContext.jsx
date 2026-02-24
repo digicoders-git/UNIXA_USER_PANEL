@@ -67,8 +67,15 @@ export const AuthProvider = ({ children }) => {
 
   const loginWithToken = async (receivedToken) => {
     try {
+      // Clear any existing session first
+      localStorage.removeItem(USER_KEY);
+      localStorage.removeItem(TOKEN_KEY);
+      
       setToken(receivedToken);
       localStorage.setItem(TOKEN_KEY, receivedToken);
+      
+      // Set token in API headers before making request
+      api.defaults.headers.common['Authorization'] = `Bearer ${receivedToken}`;
       
       // Fetch user profile to ensure token is valid and get user data
       const { data } = await api.get("/users/profile");

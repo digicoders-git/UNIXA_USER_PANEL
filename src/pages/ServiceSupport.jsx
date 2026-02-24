@@ -47,12 +47,16 @@ Preferred Date: ${formData.preferredDate || 'As soon as possible'}
 Phone: ${formData.phone}
       `.trim();
 
-      await api.post("/service-requests", { 
+      const requestData = { 
          type: formData.subject,
          description: description,
          date: new Date(),
          priority: "Medium" 
-      });
+      };
+
+      console.log('📤 Submitting service request:', requestData);
+      const response = await api.post("/service-requests", requestData);
+      console.log('✅ Response:', response.data);
 
       Swal.fire({
         icon: "success",
@@ -63,8 +67,9 @@ Phone: ${formData.phone}
       
       setFormData(prev => ({ ...prev, message: "", preferredDate: "" }));
       fetchHistory();
-      setActiveTab("history"); // Switch to history tab
+      setActiveTab("history");
     } catch (error) {
+      console.error('❌ Submit error:', error);
       Swal.fire({
         icon: "error",
         title: "Submission Failed",
@@ -244,7 +249,7 @@ Phone: ${formData.phone}
                                   </div>
                                   <div>
                                      <h3 className="font-black text-slate-900 text-lg">{req.type}</h3>
-                                     <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">ID: #{req.complaintId}</p>
+                                     <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">ID: #{req.ticketId}</p>
                                   </div>
                                </div>
                                <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-2 ${getStatusColor(req.status)}`}>
