@@ -36,7 +36,18 @@ const MyAMCs = () => {
       
       console.log('AMC Data:', amcsRes.data?.amcs);
       setAmcs(amcsRes.data?.amcs || []);
-      setSummary(summaryRes.data?.summary || null);
+      
+      const allAmcs = amcsRes.data?.amcs || [];
+      const expiredCount = allAmcs.filter(a => {
+        const isDateExpired = new Date(a.endDate) < new Date();
+        const isServicesExhausted = (a.servicesUsed || 0) >= (a.servicesTotal || 4);
+        return a.status === 'Expired' || isDateExpired || isServicesExhausted;
+      }).length;
+      
+      setSummary(summaryRes.data?.summary ? {
+        ...summaryRes.data.summary,
+        expiredAmcs: expiredCount
+      } : null);
     } catch (error) {
       console.error("Failed to fetch AMC data:", error);
       Swal.fire({
