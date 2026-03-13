@@ -139,7 +139,17 @@ const OrderDetails = () => {
                     )}
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-bold text-slate-900 text-lg">{item.productName}</h4>
+                    <div className="flex justify-between items-start">
+                      <h4 className="font-bold text-slate-900 text-lg">{item.productName}</h4>
+                      {order.status?.toLowerCase() === 'delivered' && (
+                        <Link 
+                          to={`/amc-plans?productId=${item.product?._id}&productName=${encodeURIComponent(item.productName)}`}
+                          className="px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all border border-blue-100"
+                        >
+                          Get AMC Coverage
+                        </Link>
+                      )}
+                    </div>
                     {item.variant && <p className="text-sm text-slate-500">{item.variant}</p>}
                     <div className="mt-2 flex items-center justify-between">
                        <p className="text-sm font-medium text-slate-500">Qty: {item.quantity}</p>

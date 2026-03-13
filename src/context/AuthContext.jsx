@@ -13,13 +13,25 @@ export const AuthProvider = ({ children }) => {
 
   // Hydrate from localStorage
   useEffect(() => {
-    const savedUser = localStorage.getItem(USER_KEY);
-    const savedToken = localStorage.getItem(TOKEN_KEY);
+    const savedUser = localStorage.getItem("userData");
+    const savedTokenData = localStorage.getItem("userToken");
 
-    if (savedUser && savedToken) {
+    if (savedUser && savedTokenData) {
       try {
-        setUser(JSON.parse(savedUser));
-        setToken(savedToken);
+        const user = JSON.parse(savedUser);
+        const tokenData = JSON.parse(savedTokenData);
+        
+        // Check if token has expired
+        if (Date.now() > tokenData.expiresAt) {
+          localStorage.removeItem("userData");
+          localStorage.removeItem("userToken");
+          setLoading(false);
+          return;
+        }
+        
+        setUser(user);
+        setToken(tokenData.token);
+        api.defaults.headers.common['Authorization'] = `Bearer ${tokenData.token}`;
       } catch (e) {
         console.error("Error parsing saved user data", e);
         logout();
@@ -35,11 +47,17 @@ export const AuthProvider = ({ children }) => {
       const userData = data.user;
       const userToken = data.token;
 
+      const tokenData = {
+        token: userToken,
+        expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000 // 7 days
+      };
+
       setUser(userData);
       setToken(userToken);
 
-      localStorage.setItem(USER_KEY, JSON.stringify(userData));
-      localStorage.setItem(TOKEN_KEY, userToken);
+      localStorage.setItem("userData", JSON.stringify(userData));
+      localStorage.setItem("userToken", JSON.stringify(tokenData));
+      api.defaults.headers.common['Authorization'] = `Bearer ${userToken}`;
       
       return data;
     } catch (error) {
@@ -50,14 +68,16 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
      try {
        const { data } = await api.post("/users/register", userData);
-       // Assuming register automatically logs in or requires separate login
-       // Let's assume it requires separate login unless backend returns token.
-       // Usually /users/register might return user and token.
        if (data.token) {
+           const tokenData = {
+             token: data.token,
+             expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000 // 7 days
+           };
            setUser(data.user);
            setToken(data.token);
-           localStorage.setItem(USER_KEY, JSON.stringify(data.user));
-           localStorage.setItem(TOKEN_KEY, data.token);
+           localStorage.setItem("userData", JSON.stringify(data.user));
+           localStorage.setItem("userToken", JSON.stringify(tokenData));
+           api.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
        }
        return data;
      } catch (error) {
@@ -68,11 +88,16 @@ export const AuthProvider = ({ children }) => {
   const loginWithToken = async (receivedToken) => {
     try {
       // Clear any existing session first
-      localStorage.removeItem(USER_KEY);
-      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem("userData");
+      localStorage.removeItem("userToken");
+      
+      const tokenData = {
+        token: receivedToken,
+        expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000 // 7 days
+      };
       
       setToken(receivedToken);
-      localStorage.setItem(TOKEN_KEY, receivedToken);
+      localStorage.setItem("userToken", JSON.stringify(tokenData));
       
       // Set token in API headers before making request
       api.defaults.headers.common['Authorization'] = `Bearer ${receivedToken}`;
@@ -80,7 +105,7 @@ export const AuthProvider = ({ children }) => {
       // Fetch user profile to ensure token is valid and get user data
       const { data } = await api.get("/users/profile");
       setUser(data.user);
-      localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+      localStorage.setItem("userData", JSON.stringify(data.user));
       
       return data;
     } catch (error) {
@@ -92,14 +117,14 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     setToken(null);
-    localStorage.removeItem(USER_KEY);
-    localStorage.removeItem(TOKEN_KEY);
-    // Redirect logic handled by router usually
+    localStorage.removeItem("userData");
+    localStorage.removeItem("userToken");
+    delete api.defaults.headers.common['Authorization'];
   };
 
   const updateUser = (updatedData) => {
     setUser(updatedData);
-    localStorage.setItem(USER_KEY, JSON.stringify(updatedData));
+    localStorage.setItem("userData", JSON.stringify(updatedData));
   };
 
   const value = {

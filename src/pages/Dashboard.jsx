@@ -40,7 +40,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const { data } = await api.get("/user-dashboard/overview");
+        const { data } = await api.get("user-dashboard/overview");
         setDashboardData(data);
       } catch (error) {
         console.error("Failed to fetch dashboard data:", error);

@@ -14,7 +14,8 @@ import {
    Menu,
    X,
    Bell,
-   Globe
+   Globe,
+   MessageSquare
 } from 'lucide-react';
 
 const UserLayout = () => {
@@ -28,7 +29,7 @@ const UserLayout = () => {
 
    const fetchNotifications = async () => {
       try {
-         const { data } = await api.get('/notifications/user');
+         const { data } = await api.get('notifications/user');
          setNotifications(data || []);
          setUnreadCount(data?.filter(n => !n.isRead).length || 0);
       } catch (err) {
@@ -38,7 +39,7 @@ const UserLayout = () => {
 
    const markAllRead = async () => {
       try {
-         await api.put('/notifications/user/mark-read');
+         await api.put('notifications/user/mark-read');
          setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
          setUnreadCount(0);
       } catch (err) {
@@ -58,8 +59,10 @@ const UserLayout = () => {
       { path: '/my-orders', label: 'My Orders', icon: ShoppingBag },
       { path: '/rented-ro', label: 'Rented ROs', icon: Clock },
       { path: '/my-amcs', label: 'My AMCs', icon: Award },
+      { path: '/all-amcs', label: 'All AMCs', icon: ShieldCheck },
       { path: '/amc-plans', label: 'Browse Plans', icon: ShieldCheck },
       { path: '/service-support', label: 'Service & Support', icon: Wrench },
+      { path: '/chat-support', label: 'Chat Support', icon: MessageSquare },
       { path: '/profile', label: 'My Profile', icon: User },
    ];
 
@@ -85,7 +88,17 @@ const UserLayout = () => {
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
             <div className="flex items-center justify-between h-16 px-6 border-b border-slate-100">
-               <span className="text-2xl font-black text-blue-600 tracking-tighter">UNIXA</span>
+               <div className="flex items-center gap-3">
+                  <img
+                     src="/sks-logo.png"
+                     alt="UNIXA Logo"
+                     className="w-8 h-8 object-contain"
+                  />
+                  <div className="flex flex-col">
+                     <span className="text-xl font-black text-blue-600 tracking-tighter leading-tight">UNIXA</span>
+                     <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">User Panel</span>
+                  </div>
+               </div>
                <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-slate-400 hover:text-slate-600">
                   <X size={24} />
                </button>
@@ -205,8 +218,16 @@ const UserLayout = () => {
                         <p className="text-sm font-bold text-slate-700">{user?.firstName || user?.name || 'User'}</p>
                         <p className="text-xs text-slate-400 font-medium truncate max-w-[150px]">{user?.email}</p>
                      </div>
-                     <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/20">
-                        {user?.name?.[0]?.toUpperCase() || user?.firstName?.[0]?.toUpperCase() || 'U'}
+                     <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/20 overflow-hidden">
+                        {user?.profilePicture ? (
+                           <img
+                              src={user.profilePicture}
+                              alt={user?.name || user?.firstName || 'User'}
+                              className="w-full h-full object-cover"
+                           />
+                        ) : (
+                           user?.name?.[0]?.toUpperCase() || user?.firstName?.[0]?.toUpperCase() || 'U'
+                        )}
                      </div>
                   </div>
                </div>

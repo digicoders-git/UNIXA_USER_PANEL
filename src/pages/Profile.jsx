@@ -1,9 +1,9 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
 import Swal from "sweetalert2";
-import { User, Lock, Save, LogOut, Package, CreditCard, ShieldCheck, Phone, Mail } from "lucide-react";
+import { User, Lock, Save, LogOut, Package, CreditCard, ShieldCheck, Phone, Mail, Camera, Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
@@ -23,6 +23,11 @@ const Profile = () => {
   });
   const [stats, setStats] = useState({ orders: 0, spent: 0, plan: "None" });
   const [loading, setLoading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [uploadLoading, setUploadLoading] = useState(false);
+  const [showPicModal, setShowPicModal] = useState(false);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
      if (user) {
@@ -120,6 +125,65 @@ const Profile = () => {
      });
   };
 
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        Swal.fire('Error', 'Please select an image smaller than 5MB', 'error');
+        return;
+      }
+      
+      if (!file.type.startsWith('image/')) {
+        Swal.fire('Error', 'Please select an image file', 'error');
+        return;
+      }
+      
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => setPreviewUrl(e.target.result);
+      reader.readAsDataURL(file);
+      setShowPicModal(true);
+    }
+  };
+
+  const handleUploadProfilePicture = async () => {
+    if (!selectedFile) return;
+    
+    setUploadLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('profilePicture', selectedFile);
+      
+      const response = await api.put(`/users/${user.id}/profile-picture`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      updateUser({ ...user, profilePicture: response.data.profilePicture });
+      
+      Swal.fire({
+        icon: 'success',
+        title: 'Profile Picture Updated!',
+        text: 'Your profile picture has been updated successfully.',
+        timer: 1500,
+        showConfirmButton: false
+      });
+      
+      setShowPicModal(false);
+      setSelectedFile(null);
+      setPreviewUrl(null);
+    } catch (error) {
+      Swal.fire('Upload Failed', error.response?.data?.message || 'Failed to upload profile picture', 'error');
+    } finally {
+      setUploadLoading(false);
+    }
+  };
+
+  const handleCameraClick = () => {
+    fileInputRef.current?.click();
+  };
+
   return (
     <div className="max-w-5xl mx-auto space-y-8 animate-fade-in pb-12">
        
@@ -131,10 +195,31 @@ const Profile = () => {
           </div>
           
           <div className="px-8 pb-8 flex flex-col md:flex-row items-start md:items-end -mt-12 gap-6 relative z-10">
-             <div className="w-24 h-24 md:w-32 md:h-32 bg-white rounded-full p-1.5 shadow-xl ring-4 ring-slate-50/50">
-                <div className="w-full h-full bg-slate-900 rounded-full flex items-center justify-center text-3xl md:text-4xl font-black text-white uppercase shadow-inner">
-                   {user?.firstName?.[0]}{user?.lastName?.[0]}
-                </div>
+             <div className="w-24 h-24 md:w-32 md:h-32 bg-white rounded-full p-1.5 shadow-xl ring-4 ring-slate-50/50 relative group">
+                {user?.profilePicture ? (
+                  <img 
+                    src={user.profilePicture} 
+                    alt={`${user.firstName} ${user.lastName}`}
+                    className="w-full h-full rounded-full object-cover shadow-inner"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-slate-900 rounded-full flex items-center justify-center text-3xl md:text-4xl font-black text-white uppercase shadow-inner">
+                     {user?.firstName?.[0]}{user?.lastName?.[0]}
+                  </div>
+                )}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileSelect}
+                  accept="image/*"
+                  className="hidden"
+                />
+                <button
+                  onClick={handleCameraClick}
+                  className="absolute bottom-0 right-0 w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-indigo-700 transition-all hover:scale-110 opacity-0 group-hover:opacity-100"
+                >
+                  <Camera size={14} />
+                </button>
              </div>
              
              <div className="flex-1 pt-2 md:pt-0 pb-2">
@@ -323,6 +408,57 @@ const Profile = () => {
              </div>
           </div>
        </div>
+
+       {/* Profile Picture Upload Modal */}
+       {showPicModal && (
+         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+           <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
+             <div className="text-center mb-6">
+               <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                 <Camera className="text-indigo-600" size={24} />
+               </div>
+               <h3 className="text-xl font-bold text-slate-900 mb-2">Update Profile Picture</h3>
+               <p className="text-slate-500 text-sm">This will be your new profile picture. Make sure it's clear and professional.</p>
+             </div>
+             
+             {previewUrl && (
+               <div className="flex justify-center mb-6">
+                 <img
+                   src={previewUrl}
+                   alt="Preview"
+                   className="w-32 h-32 object-cover rounded-full border-4 border-indigo-100 shadow-lg"
+                 />
+               </div>
+             )}
+             
+             <div className="flex gap-4">
+               <button
+                 onClick={() => {
+                   setShowPicModal(false);
+                   setSelectedFile(null);
+                   setPreviewUrl(null);
+                 }}
+                 className="flex-1 py-3 px-4 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-all"
+               >
+                 Cancel
+               </button>
+               <button
+                 onClick={handleUploadProfilePicture}
+                 disabled={uploadLoading}
+                 className="flex-1 py-3 px-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+               >
+                 {uploadLoading ? (
+                   "Uploading..."
+                 ) : (
+                   <>
+                     <Upload size={16} /> Upload
+                   </>
+                 )}
+               </button>
+             </div>
+           </div>
+         </div>
+       )}
     </div>
   );
 };
