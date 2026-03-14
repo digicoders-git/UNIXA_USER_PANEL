@@ -108,7 +108,7 @@ const MyAMCs = () => {
       });
       if (result.isConfirmed) {
         const notes = document.getElementById('serviceNotes')?.value || '';
-        await api.post(`book-service/${amc._id}`, { notes });
+        await api.post(`my-amcs/${amc._id}/request-service`, { notes });
         Swal.fire('Success', 'Service booked successfully', 'success');
         fetchData();
       }
