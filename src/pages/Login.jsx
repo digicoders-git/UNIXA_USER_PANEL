@@ -30,11 +30,9 @@ const Login = () => {
       }
     };
 
-    const token = searchParams.get("token") || localStorage.getItem('userPanelToken');
+    const token = searchParams.get("token");
     if (token) {
       handleTokenLogin(token);
-      // Clear the token from localStorage after use
-      localStorage.removeItem('userPanelToken');
     }
   }, [searchParams, loginWithToken, navigate]);
 

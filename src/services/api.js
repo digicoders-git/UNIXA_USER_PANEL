@@ -1,7 +1,14 @@
 import axios from "axios";
 
-// Environment variable handling
 const API_URL = import.meta.env.VITE_API_URL;
+const BASE_URL = API_URL?.replace('/api', '') || 'http://localhost:5000';
+
+export const getImageUrl = (path) => {
+  if (!path) return '';
+  if (path.startsWith('http')) return path;
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  return `${BASE_URL}${cleanPath}`;
+};
 
 const api = axios.create({
   baseURL: API_URL,

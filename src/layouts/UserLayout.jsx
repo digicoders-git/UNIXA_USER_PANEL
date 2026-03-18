@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation, Link } from 'react-router-dom';
-import api from '../services/api';
+import api, { getImageUrl } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import {
    LayoutDashboard,
@@ -221,7 +221,7 @@ const UserLayout = () => {
                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/20 overflow-hidden">
                         {user?.profilePicture ? (
                            <img
-                              src={user.profilePicture}
+                              src={getImageUrl(user.profilePicture)}
                               alt={user?.name || user?.firstName || 'User'}
                               className="w-full h-full object-cover"
                            />
