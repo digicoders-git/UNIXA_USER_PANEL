@@ -87,17 +87,14 @@ const UserLayout = () => {
         fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 transform transition-transform duration-300 ease-in-out
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
-            <div className="flex items-center justify-between h-16 px-6 border-b border-slate-100">
-               <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center h-36 px-6 border-b border-slate-100">
+               <div className="flex flex-col items-center gap-2 w-full py-2">
                   <img
-                     src="/sks-logo.png"
+                     src="/favicon.png"
                      alt="UNIXA Logo"
-                     className="w-8 h-8 object-contain"
+                     className="w-28 h-28 object-contain"
                   />
-                  <div className="flex flex-col">
-                     <span className="text-xl font-black text-blue-600 tracking-tighter leading-tight">UNIXA</span>
-                     <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">User Panel</span>
-                  </div>
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">User Panel</span>
                </div>
                <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-slate-400 hover:text-slate-600">
                   <X size={24} />
