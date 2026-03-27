@@ -11,6 +11,7 @@ import AMCPlans from "./pages/AMCPlans";
 import MyAMCs from "./pages/MyAMCs";
 import AllAMCs from "./pages/AllAMCs";
 import ServiceSupport from "./pages/ServiceSupport";
+import MyComplaints from "./pages/MyComplaints";
 import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
 import ChatSupport from "./pages/ChatSupport";
@@ -42,6 +43,7 @@ const App = () => {
             <Route path="my-amcs" element={<MyAMCs />} />
             <Route path="all-amcs" element={<AllAMCs />} />
             <Route path="service-support" element={<ServiceSupport />} />
+            <Route path="my-complaints" element={<MyComplaints />} />
             <Route path="notifications" element={<Notifications />} />
             <Route path="profile" element={<Profile />} />
             <Route path="chat-support" element={<ChatSupport />} />

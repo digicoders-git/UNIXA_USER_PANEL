@@ -140,22 +140,14 @@ const Login = () => {
       const data = await response.json();
       
       if (response.ok) {
-        // Store token and user data with consistent keys
-        const tokenData = {
-          token: data.token,
-          expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000 // 7 days
-        };
-        localStorage.setItem('userToken', JSON.stringify(tokenData));
-        localStorage.setItem('userData', JSON.stringify(data.user));
-        
+        login(data.user, data.token);
         Swal.fire({
           icon: 'success',
           title: 'Login Successful!',
           text: 'Welcome to UNIXA User Panel',
           confirmButtonColor: '#2563eb'
         }).then(() => {
-          // Force page reload to trigger AuthContext
-          window.location.href = '/dashboard';
+          navigate('/dashboard');
         });
       } else {
         throw new Error(data.message || 'Invalid OTP');
@@ -182,9 +174,13 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 font-sans">
        <div className="w-full max-w-md bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden md:p-12 p-8 animate-fade-in space-y-8">
-           <div className="text-center space-y-2">
-              <h1 className="text-4xl font-black text-blue-600 tracking-tighter">UNIXA</h1>
-              <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">User Portal</p>
+           <div className="flex flex-col items-center text-center space-y-10">
+              <img src="/favicon.png" alt="logo" width="180px" height="180px">
+             
+              </img>
+              <p className='text-xl font-bold'>
+                User Portal
+              </p>
               <p className="text-slate-400 text-sm font-medium">
                 {step === 1 ? 'Enter your mobile number or email' : 'Enter the OTP sent to your device'}
               </p>

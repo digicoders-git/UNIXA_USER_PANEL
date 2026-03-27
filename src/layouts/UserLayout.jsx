@@ -15,7 +15,8 @@ import {
    X,
    Bell,
    Globe,
-   MessageSquare
+   MessageSquare,
+   AlertTriangle
 } from 'lucide-react';
 
 const UserLayout = () => {
@@ -62,6 +63,7 @@ const UserLayout = () => {
       { path: '/all-amcs', label: 'All AMCs', icon: ShieldCheck },
       { path: '/amc-plans', label: 'Browse Plans', icon: ShieldCheck },
       { path: '/service-support', label: 'Service & Support', icon: Wrench },
+      { path: '/my-complaints', label: 'My Complaints', icon: AlertTriangle },
       { path: '/chat-support', label: 'Chat Support', icon: MessageSquare },
       { path: '/profile', label: 'My Profile', icon: User },
    ];

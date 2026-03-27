@@ -130,8 +130,12 @@ const OrderDetails = () => {
               {order.items.map((item, index) => (
                 <div key={index} className="p-6 flex items-start gap-4 hover:bg-slate-50/50 transition-colors">
                   <div className="w-20 h-20 bg-slate-100 rounded-xl border-2 border-white shadow-sm flex-shrink-0 overflow-hidden">
-                    {item.product?.mainImage?.url ? (
-                      <img src={item.product.mainImage.url} alt={item.productName} className="w-full h-full object-cover" />
+                    {item.productImage || item.product?.mainImage?.url ? (
+                      <img
+                        src={item.productImage || item.product.mainImage.url}
+                        alt={item.productName}
+                        className="w-full h-full object-contain p-1"
+                      />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-slate-400 font-bold text-xl">
                         {item.productName?.charAt(0)}

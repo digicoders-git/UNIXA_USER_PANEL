@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import api from "../services/api";
+import api, { getImageUrl } from "../services/api";
 import { 
   ShieldCheck, 
   Calendar, 
@@ -125,7 +125,7 @@ const MyAMCs = () => {
     return (
       <div className={`bg-white rounded-[40px] border border-slate-100 overflow-hidden transition-all group ${isHistory ? 'opacity-70 grayscale-[0.5]' : 'hover:shadow-xl'}`}>
         <div className="relative h-48 bg-gradient-to-br from-slate-50 to-blue-50/30 flex items-center justify-center p-8">
-          {amc.productImage ? <img src={amc.productImage} alt={amc.productName} className="h-full w-auto object-contain"/> : <Package size={64} className="text-slate-300" />}
+          {amc.productImage ? <img src={getImageUrl(amc.productImage)} alt={amc.productName} className="h-full w-auto object-contain"/> : <Package size={64} className="text-slate-300" />}
           <div className={`absolute top-4 right-4 px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-widest ${getStatusColor(amc)}`}>
             {getStatusText(amc)}
           </div>

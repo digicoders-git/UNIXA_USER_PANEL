@@ -17,10 +17,13 @@ const api = axios.create({
 // Request Interceptor: Add Authorization Header
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("user-token"); // Ensure consistent key
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`; 
-    }
+    try {
+      const tokenData = localStorage.getItem("userToken");
+      if (tokenData) {
+        const { token } = JSON.parse(tokenData);
+        if (token) config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch (e) {}
     return config;
   },
   (error) => Promise.reject(error)
@@ -31,10 +34,9 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      // Clear storage and redirect to login if token is invalid
-      localStorage.removeItem("user-token");
-      localStorage.removeItem("user-data");
-      // Optionally redirect: window.location.href = "/login";
+      localStorage.removeItem("userToken");
+      localStorage.removeItem("userData");
+      window.location.href = "/login";
     }
     return Promise.reject(error);
   }

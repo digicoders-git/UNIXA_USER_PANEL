@@ -40,29 +40,17 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = async (email, password) => {
-    try {
-      const { data } = await api.post("/users/login", { email, password });
-      
-      const userData = data.user;
-      const userToken = data.token;
-
-      const tokenData = {
-        token: userToken,
-        expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000 // 7 days
-      };
-
-      setUser(userData);
-      setToken(userToken);
-
-      localStorage.setItem("userData", JSON.stringify(userData));
-      localStorage.setItem("userToken", JSON.stringify(tokenData));
-      api.defaults.headers.common['Authorization'] = `Bearer ${userToken}`;
-      
-      return data;
-    } catch (error) {
-       throw error.response?.data?.message || "Login failed";
-    }
+  // Called after OTP verification with token + user from server
+  const login = (userData, userToken) => {
+    const tokenData = {
+      token: userToken,
+      expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000
+    };
+    setUser(userData);
+    setToken(userToken);
+    localStorage.setItem("userData", JSON.stringify(userData));
+    localStorage.setItem("userToken", JSON.stringify(tokenData));
+    api.defaults.headers.common['Authorization'] = `Bearer ${userToken}`;
   };
 
   const register = async (userData) => {

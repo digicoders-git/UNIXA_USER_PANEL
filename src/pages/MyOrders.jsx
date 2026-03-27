@@ -93,9 +93,13 @@ const MyOrders = () => {
               className="block bg-white p-6 md:p-8 rounded-[32px] border border-slate-100 shadow-sm hover:shadow-xl hover:border-blue-100 transition-all group relative overflow-hidden"
             >
               <div className="flex flex-col md:flex-row md:items-center gap-6 relative z-10">
-                {/* Visual Icon */}
-                <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center shrink-0 group-hover:bg-blue-50 transition-colors">
-                   <Package className="text-blue-500" size={32} strokeWidth={1.5} />
+                {/* Visual Icon / Product Image */}
+                <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center shrink-0 group-hover:bg-blue-50 transition-colors overflow-hidden border border-slate-100">
+                   {order.items?.[0]?.productImage ? (
+                     <img src={order.items[0].productImage} alt={order.items[0].productName} className="w-full h-full object-contain p-1" />
+                   ) : (
+                     <Package className="text-blue-500" size={32} strokeWidth={1.5} />
+                   )}
                 </div>
 
                 {/* Main Info */}
