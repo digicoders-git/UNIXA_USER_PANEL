@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import api from "../services/api";
+import api, { getImageUrl } from "../services/api";
 import { 
   Package, 
   Truck, 
@@ -96,7 +96,7 @@ const MyOrders = () => {
                 {/* Visual Icon / Product Image */}
                 <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center shrink-0 group-hover:bg-blue-50 transition-colors overflow-hidden border border-slate-100">
                    {order.items?.[0]?.productImage ? (
-                     <img src={order.items[0].productImage} alt={order.items[0].productName} className="w-full h-full object-contain p-1" />
+                     <img src={getImageUrl(order.items[0].productImage)} alt={order.items[0].productName} className="w-full h-full object-contain p-1" />
                    ) : (
                      <Package className="text-blue-500" size={32} strokeWidth={1.5} />
                    )}

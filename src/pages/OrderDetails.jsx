@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import api from "../services/api";
+import api, { getImageUrl } from "../services/api";
 import { 
   Package, 
   Truck, 
@@ -132,7 +132,7 @@ const OrderDetails = () => {
                   <div className="w-20 h-20 bg-slate-100 rounded-xl border-2 border-white shadow-sm flex-shrink-0 overflow-hidden">
                     {item.productImage || item.product?.mainImage?.url ? (
                       <img
-                        src={item.productImage || item.product.mainImage.url}
+                        src={getImageUrl(item.productImage || item.product?.mainImage?.url)}
                         alt={item.productName}
                         className="w-full h-full object-contain p-1"
                       />
